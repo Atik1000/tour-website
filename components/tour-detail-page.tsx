@@ -33,6 +33,7 @@ import {
   AddToCartPayload,
   getRecommendedTours
 } from "@/services/tourService"
+import { getTravelerLimits } from "@/lib/travelers"
 import { useAppDispatch } from "@/lib/hooks"
 import { fetchCartCount } from "@/lib/features/cart/cartSlice"
 import { useRouter } from "next/navigation"
@@ -203,36 +204,40 @@ function TravelerCounter({
   isOpen,
   onClose,
   tour,
+  timeSlot,
   counts,
   onUpdateCount
 }: {
   isOpen: boolean
   onClose: () => void
   tour: TourPlan
+  timeSlot?: TourTimeSlot | null
   counts: any
   onUpdateCount: (key: string, delta: number, max: number) => void
 }) {
   if (!isOpen) return null
 
+  const limits = getTravelerLimits(tour, timeSlot)
+
   return (
     <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-10 w-[90vw] sm:w-[350px]">
 
       {/* Adult */}
-      {tour.max_adults > 0 && (
+      {limits.adults.show && (
         <div className="mb-4">
           <label className="block text-sm font-semibold text-gray-900 mb-2">
             Adult <span className="text-gray-600 font-normal text-xs">(Age {tour.adult_age_min}-{tour.adult_age_max})</span>
           </label>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => onUpdateCount('adults', -1, tour.max_adults)}
+              onClick={() => onUpdateCount('adults', -1, limits.adults.max)}
               className="p-2 hover:bg-gray-100 rounded-full border border-gray-300"
             >
               <Minus size={16} className="text-gray-600" />
             </button>
             <span className="text-lg font-semibold text-gray-900 w-6 text-center">{counts.adults}</span>
             <button
-              onClick={() => onUpdateCount('adults', 1, tour.max_adults)}
+              onClick={() => onUpdateCount('adults', 1, limits.adults.max)}
               className="p-2 hover:bg-gray-100 rounded-full border border-gray-300"
             >
               <Plus size={16} className="text-gray-600" />
@@ -242,21 +247,21 @@ function TravelerCounter({
       )}
 
       {/* Child */}
-      {tour.max_children > 0 && (
+      {limits.children.show && (
         <div className="mb-4">
           <label className="block text-sm font-semibold text-gray-900 mb-2">
             Child <span className="text-gray-600 font-normal text-xs">(Age {tour.child_age_min}-{tour.child_age_max})</span>
           </label>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => onUpdateCount('children', -1, tour.max_children)}
+              onClick={() => onUpdateCount('children', -1, limits.children.max)}
               className="p-2 hover:bg-gray-100 rounded-full border border-gray-300"
             >
               <Minus size={16} className="text-gray-600" />
             </button>
             <span className="text-lg font-semibold text-gray-900 w-6 text-center">{counts.children}</span>
             <button
-              onClick={() => onUpdateCount('children', 1, tour.max_children)}
+              onClick={() => onUpdateCount('children', 1, limits.children.max)}
               className="p-2 hover:bg-gray-100 rounded-full border border-gray-300"
             >
               <Plus size={16} className="text-gray-600" />
@@ -266,21 +271,21 @@ function TravelerCounter({
       )}
 
       {/* Infant */}
-      {tour.max_infants > 0 && (
+      {limits.infants.show && (
         <div className="mb-4">
           <label className="block text-sm font-semibold text-gray-900 mb-2">
             Infant <span className="text-gray-600 font-normal text-xs">(Age {tour.infant_age_min}-{tour.infant_age_max})</span>
           </label>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => onUpdateCount('infants', -1, tour.max_infants)}
+              onClick={() => onUpdateCount('infants', -1, limits.infants.max)}
               className="p-2 hover:bg-gray-100 rounded-full border border-gray-300"
             >
               <Minus size={16} className="text-gray-600" />
             </button>
             <span className="text-lg font-semibold text-gray-900 w-6 text-center">{counts.infants}</span>
             <button
-              onClick={() => onUpdateCount('infants', 1, tour.max_infants)}
+              onClick={() => onUpdateCount('infants', 1, limits.infants.max)}
               className="p-2 hover:bg-gray-100 rounded-full border border-gray-300"
             >
               <Plus size={16} className="text-gray-600" />
@@ -290,21 +295,21 @@ function TravelerCounter({
       )}
 
       {/* Youth */}
-      {tour.max_youth > 0 && (
+      {limits.youths.show && (
         <div className="mb-4">
           <label className="block text-sm font-semibold text-gray-900 mb-2">
             Youth <span className="text-gray-600 font-normal text-xs">(Age {tour.youth_age_min}-{tour.youth_age_max})</span>
           </label>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => onUpdateCount('youths', -1, tour.max_youth)}
+              onClick={() => onUpdateCount('youths', -1, limits.youths.max)}
               className="p-2 hover:bg-gray-100 rounded-full border border-gray-300"
             >
               <Minus size={16} className="text-gray-600" />
             </button>
             <span className="text-lg font-semibold text-gray-900 w-6 text-center">{counts.youths}</span>
             <button
-              onClick={() => onUpdateCount('youths', 1, tour.max_youth)}
+              onClick={() => onUpdateCount('youths', 1, limits.youths.max)}
               className="p-2 hover:bg-gray-100 rounded-full border border-gray-300"
             >
               <Plus size={16} className="text-gray-600" />
@@ -314,21 +319,21 @@ function TravelerCounter({
       )}
 
       {/* Student UE */}
-      {tour.max_student_eu > 0 && (
+      {limits.students.show && (
         <div className="mb-4">
           <label className="block text-sm font-semibold text-gray-900 mb-2">
             Student EU <span className="text-gray-600 font-normal text-xs">(Age {tour.student_eu_age_min}-{tour.student_eu_age_max})</span>
           </label>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => onUpdateCount('students', -1, tour.max_student_eu)}
+              onClick={() => onUpdateCount('students', -1, limits.students.max)}
               className="p-2 hover:bg-gray-100 rounded-full border border-gray-300"
             >
               <Minus size={16} className="text-gray-600" />
             </button>
             <span className="text-lg font-semibold text-gray-900 w-6 text-center">{counts.students}</span>
             <button
-              onClick={() => onUpdateCount('students', 1, tour.max_student_eu)}
+              onClick={() => onUpdateCount('students', 1, limits.students.max)}
               className="p-2 hover:bg-gray-100 rounded-full border border-gray-300"
             >
               <Plus size={16} className="text-gray-600" />
@@ -1040,6 +1045,7 @@ export default function TourDetailPage({ tourId }: { tourId: number }) {
                   isOpen={isTravelerPickerOpen}
                   onClose={() => setIsTravelerPickerOpen(false)}
                   tour={tour}
+                  timeSlot={selectedTimeSlot}
                   counts={counts}
                   onUpdateCount={handleUpdateCount}
                 />
