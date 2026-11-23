@@ -59,7 +59,7 @@ function DatePicker({
   tourId: number
   onDateSelect: (date: TourDate) => void
 }) {
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 0, 1))
+  const [currentDate, setCurrentDate] = useState(() => { const now = new Date(); return new Date(now.getFullYear(), now.getMonth(), 1) })
   const [availableDates, setAvailableDates] = useState<TourDate[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -140,7 +140,19 @@ function DatePicker({
   const nextMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
   const nextMonthData = renderCalendar(nextMonth)
 
+  const today = new Date()
+  const isAtCurrentMonth = currentDate.getFullYear() === today.getFullYear() && currentDate.getMonth() === today.getMonth()
+
+  // Always open on the current month
+  useEffect(() => {
+    if (isOpen) {
+      const now = new Date()
+      setCurrentDate(new Date(now.getFullYear(), now.getMonth(), 1))
+    }
+  }, [isOpen])
+
   const handlePrevMonth = () => {
+    if (isAtCurrentMonth) return
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))
   }
 
@@ -154,7 +166,7 @@ function DatePicker({
     <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg p-4 md:p-6 z-50 w-[90vw] max-w-[350px] md:max-w-[700px] md:w-[700px]">
       <div className="flex justify-between items-start">
         {/* Left Arrow */}
-        <button onClick={handlePrevMonth} className="p-2 hover:bg-gray-100 rounded mt-1">
+        <button onClick={handlePrevMonth} disabled={isAtCurrentMonth} className="p-2 hover:bg-gray-100 rounded mt-1 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent">
           <ChevronLeft size={20} className="text-gray-600" />
         </button>
 
