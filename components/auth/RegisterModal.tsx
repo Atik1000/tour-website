@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { X, Loader2, AlertTriangle, CheckCircle2 } from "lucide-react"
 import { registerUser } from "@/services/authService"
+import { WhatsAppInput } from "@/components/whatsapp-input"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -130,16 +131,16 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-sm font-medium text-[#051036]">Phone</label>
-                            <input
-                                name="phone"
-                                type="tel"
-                                required
+                            <label htmlFor="register-whatsapp" className="text-sm font-medium text-[#051036]">WhatsApp Number</label>
+                            <WhatsAppInput
+                                id="register-whatsapp"
                                 value={formData.phone}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-all placeholder:text-gray-400"
-                                placeholder="+1 234 567 890"
+                                onChange={(phone) => setFormData((d) => ({ ...d, phone }))}
+                                fieldClassName="rounded-xl border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
+                                activeItemClassName="bg-orange-50 text-orange-700"
+                                popoverClassName="z-[10000]"
                             />
+                            <p className="text-xs text-gray-500">We use it to send you booking details.</p>
                         </div>
 
                         <div className="space-y-1.5">
