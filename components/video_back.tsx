@@ -17,9 +17,9 @@ export default function VideoBackgroundPage() {
       {/* Content */}
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 text-center gap-4">
         <img
-          src="/images/logo_city_roam_tickets-transparent.png"   // <- put your logo file in /public/images/logo.png
+          src="/images/logo_city_rome_tickets.png"
           alt="City Rome Tickets"
-          className="h-10 w-auto sm:h-30"
+          className="h-14 w-auto sm:h-30 rounded-xl bg-white px-2"
         />
         <h1 className="text-white text-4xl sm:text-6xl md:text-7xl font-bold text-balance">
             City Rome Tickets

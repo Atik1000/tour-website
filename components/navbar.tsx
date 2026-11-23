@@ -104,7 +104,7 @@ export default function Navbar() {
               <div className="text-center">
                 <Link href="/" className="block cursor-pointer">
                   <img
-                    src="/images/logo_city_roam_tickets-transparent.png"
+                    src="/images/logo_city_rome_tickets.png"
                     alt="City Rome Tickets"
                     className="h-25 w-auto md:h-22 sm:h-22"
                   />

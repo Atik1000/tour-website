@@ -131,7 +131,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
                         </div>
 
                         <div className="space-y-1.5">
-                            <label htmlFor="register-whatsapp" className="text-sm font-medium text-[#051036]">WhatsApp Number</label>
+                            <label htmlFor="register-whatsapp" className="text-sm font-medium text-[#051036]">WhatsApp</label>
                             <WhatsAppInput
                                 id="register-whatsapp"
                                 value={formData.phone}

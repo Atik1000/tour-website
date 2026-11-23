@@ -16,10 +16,10 @@ export default function Footer() {
           {/* Brand / short description */}
           <div className="lg:col-span-6">
             <div className="space-y-4">
-              <div className="rounded-xl ">
+              <div className="inline-block rounded-xl bg-white px-3">
                 <Link href="/" className="block cursor-pointer">
                   <img
-                    src="/images/logo_city_roam_tickets-transparent.png"
+                    src="/images/logo_city_rome_tickets.png"
                     alt="City Rome Tickets"
                     className="h-25 w-auto md:h-22 sm:h-22"
                   />
