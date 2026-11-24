@@ -15,7 +15,7 @@ const RomeMistakesBlog = () => {
         {/* Hero */}
         <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
           <img
-            src="/blogs/rome-travel-tips.png"
+            src="/images/carousel1.jpg"
             onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/images/carousel1.jpg"; }}
             alt="Rome travel tips mistakes"
             className="w-full h-full object-cover"

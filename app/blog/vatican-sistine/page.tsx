@@ -15,7 +15,7 @@ const VaticanSistineBlog = () => {
         {/* Hero Section */}
         <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
           <img
-            src="/blogs/vatican-sistine.png"
+            src="/images/carousel2.jpg"
             onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/images/carousel1.jpg"; }}
             alt="Vatican Museums and Sistine Chapel"
             className="w-full h-full object-cover"

@@ -15,7 +15,7 @@ const RomeItineraryBlog = () => {
         {/* Hero */}
         <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
           <img
-            src="/blogs/rome-itinerary.png"
+            src="/images/memory_1.webp"
             onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/images/carousel1.jpg"; }}
             alt="Rome 3 Day Itinerary"
             className="w-full h-full object-cover"
