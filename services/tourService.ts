@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "./authService";
+import { API_BASE_URL, readErrorMessage } from "./authService";
 
 export interface TourImage {
     id: number;
@@ -314,18 +314,12 @@ export async function createBooking(payload: BookingPayload, token?: string): Pr
     const response = await fetch(`${API_BASE_URL}/tour/booking/`, {
         method: "POST",
         headers: headers,
-        body: JSON.stringify(payload),
+        // The booking endpoint requires the number as `whatsapp`.
+        body: JSON.stringify(payload.phone !== undefined ? { ...payload, whatsapp: payload.phone } : payload),
     });
 
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        let errorMessage = "Failed to create booking";
-        if (errorData.non_field_errors && Array.isArray(errorData.non_field_errors)) {
-            errorMessage = errorData.non_field_errors[0];
-        } else {
-            errorMessage = errorData.message || errorMessage;
-        }
-        throw new Error(errorMessage);
+        throw new Error(await readErrorMessage(response, "We couldn't complete your booking. Please try again."));
     }
 
     return response.json();

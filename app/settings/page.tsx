@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { User, Bell, CreditCard, ChevronDown, Loader2, AlertTriangle, Trash2, History, Calendar, DollarSign, Tag } from "lucide-react"
-import { getUserProfile, updateUserProfile, deleteUserAccount, removeTokens } from "@/services/authService"
+import { getUserProfile, updateUserProfile, deleteUserAccount, removeTokens, profileWhatsApp } from "@/services/authService"
 import { getBookingHistory } from "@/services/tourService"
 import { WhatsAppInput, parseWhatsApp } from "@/components/whatsapp-input"
 import { useRouter } from "next/navigation"
@@ -84,7 +84,7 @@ export default function SettingsPage() {
                     first_name: data.first_name || "",
                     last_name: data.last_name || "",
                     email: data.email || "",
-                    phone: data.phone || data.mobile || "",
+                    phone: profileWhatsApp(data),
                     day: d,
                     month: m,
                     year: y

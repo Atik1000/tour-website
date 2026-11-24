@@ -10,7 +10,7 @@ const FIELD_LABELS: Record<string, string> = {
 };
 
 // Turn an API error response into one readable sentence, whatever shape it has.
-async function readErrorMessage(response: Response, fallback: string): Promise<string> {
+export async function readErrorMessage(response: Response, fallback: string): Promise<string> {
     let data: any;
     try {
         data = await response.json();
@@ -31,6 +31,12 @@ async function readErrorMessage(response: Response, fallback: string): Promise<s
         messages.push(label && key !== "non_field_errors" ? `${label}: ${text}` : text);
     }
     return messages.length ? messages.join("\n") : fallback;
+}
+
+// The account's WhatsApp number, whichever name the API uses for it.
+export function profileWhatsApp(profile: any): string {
+    const value = profile?.whatsapp || profile?.phone || profile?.mobile || ""
+    return value ? String(value) : ""
 }
 
 export async function registerUser(data: any) {
@@ -126,12 +132,12 @@ export async function updateUserProfile(data: any) {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(data),
+        // Some endpoints call the number `whatsapp`, older ones `phone`: send both.
+        body: JSON.stringify(data.phone !== undefined ? { ...data, whatsapp: data.phone } : data),
     });
 
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Failed to update user profile");
+        throw new Error(await readErrorMessage(response, "Failed to update your profile. Please try again."));
     }
 
     return response.json();

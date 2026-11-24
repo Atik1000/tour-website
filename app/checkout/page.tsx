@@ -5,7 +5,8 @@ import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { getCart, createBooking, BookingPayload, TravelerDetail } from "@/services/tourService"
 
-import { isLoggedIn, getUserProfile, updateUserProfile } from "@/services/authService"
+import { isLoggedIn, getUserProfile, updateUserProfile, profileWhatsApp } from "@/services/authService"
+import { BookingSuccess } from "@/components/booking-success"
 import { Loader2, User, Mail, Globe, Check, CheckCircle2, AlertCircle, ShieldCheck, ChevronsUpDown } from "lucide-react"
 import {
     AlertDialog,
@@ -49,6 +50,7 @@ export default function CheckoutPage() {
     const [messageModalTitle, setMessageModalTitle] = useState("")
     const [messageModalContent, setMessageModalContent] = useState("")
     const [onModalClose, setOnModalClose] = useState<(() => void) | null>(null)
+    const [bookingDone, setBookingDone] = useState(false)
 
     const showMessage = (title: string, content: string, onClose?: () => void) => {
         setMessageModalTitle(title)
@@ -89,7 +91,7 @@ export default function CheckoutPage() {
             try {
                 const profile = await getUserProfile();
                 prepopulatedName = `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim();
-                const phone = profile.phone ? String(profile.phone) : ""
+                const phone = profileWhatsApp(profile)
                 setProfilePhone(phone)
                 setGuestDetails({
                     full_name: prepopulatedName,
@@ -245,20 +247,23 @@ export default function CheckoutPage() {
             }
 
             await createBooking(payload, token)
-            showMessage("Success", "Booking successful!", () => {
-                // Cleanup
-                if (isBookNow) {
-                    localStorage.removeItem('bookNowData')
-                } else {
-                    localStorage.removeItem('cartItemId')
-                }
-                localStorage.removeItem('guestCheckoutDetails')
-                window.location.href = "/"
-            })
+            // The booking exists now: clear what was booked so it can't be booked twice.
+            if (isBookNow) {
+                localStorage.removeItem('bookNowData')
+            } else {
+                localStorage.removeItem('cartItemId')
+            }
+            localStorage.removeItem('guestCheckoutDetails')
+            setBookingDone(true)
 
         } catch (error: any) {
             console.error("Booking failed", error)
-            showMessage("Error", error.message || "Booking failed")
+            showMessage(
+                "Error",
+                error instanceof TypeError
+                    ? "We couldn't reach the server. Check your internet connection and try again."
+                    : error.message || "Booking failed. Please try again."
+            )
         } finally {
             setLoading(false)
         }
@@ -450,6 +455,15 @@ export default function CheckoutPage() {
 
             <Footer />
 
+            {bookingDone && (
+                <BookingSuccess
+                    name={guestDetails.full_name}
+                    email={guestDetails.email}
+                    whatsapp={guestDetails.phone.trim()}
+                    onDone={() => { window.location.href = "/" }}
+                />
+            )}
+
             <AlertDialog open={messageModalOpen} onOpenChange={setMessageModalOpen}>
                 <AlertDialogContent className="sm:max-w-md bg-white border-0 shadow-2xl rounded-2xl p-0 overflow-hidden">
                     <div className={`p-6 flex flex-col items-center justify-center border-b ${messageModalTitle === "Success" ? "bg-green-50 border-green-100" :
@@ -474,7 +488,7 @@ export default function CheckoutPage() {
                             </div>
                         </div>
                         <AlertDialogTitle className="text-xl font-bold text-gray-900 text-center">{messageModalTitle}</AlertDialogTitle>
-                        <AlertDialogDescription className="text-center text-gray-600 mt-2 max-w-[280px]">
+                        <AlertDialogDescription className="text-center text-gray-600 mt-2 max-w-[280px] whitespace-pre-line">
                             {messageModalContent}
                         </AlertDialogDescription>
                     </div>
