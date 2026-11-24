@@ -3,6 +3,7 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://m71
 const FIELD_LABELS: Record<string, string> = {
     email: "Email",
     phone: "WhatsApp number",
+    whatsapp: "WhatsApp number",
     first_name: "First name",
     last_name: "Last name",
     password: "Password",
@@ -33,12 +34,14 @@ async function readErrorMessage(response: Response, fallback: string): Promise<s
 }
 
 export async function registerUser(data: any) {
+    // The register endpoint names the number `whatsapp`; the rest of the API
+    // (profile, bookings) still calls it `phone`, so send both.
     const response = await fetch(`${API_BASE_URL}/auth/register/register`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, whatsapp: data.phone }),
     });
 
     if (!response.ok) {
