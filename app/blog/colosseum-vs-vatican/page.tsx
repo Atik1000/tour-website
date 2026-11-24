@@ -28,6 +28,7 @@ const RomeTicketComparisonBlog = () => {
         <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
           <img
             src="/blogs/collusum_vatican.png"
+            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/images/carousel1.jpg"; }}
             alt="Colosseum vs Vatican vs Borghese"
             className="w-full h-full object-cover"
             style={{ objectPosition: "50% 78%" }} // center horizontally, top vertically

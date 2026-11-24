@@ -27,6 +27,7 @@ const BookItalyAttractionsLikeAPro = () => {
         <section className="relative h-[60vh] md:h-[80vh] overflow-hidden">
           <img
             src="/blogs/how_to_book_italy.png"
+            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/images/carousel1.jpg"; }}
             alt="How to book Italy attractions like a pro"
             className="w-full h-full object-cover"
             style={{ objectPosition: "50% 38%" }} // center horizontally, top vertically

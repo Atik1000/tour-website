@@ -26,6 +26,7 @@ const ColosseumPrivateTourBlog = () => {
         <section className="relative h-[50vh] md:h-[60vh] overflow-hidden">
           <img
             src="/blogs/Colosseum_Roman.png"
+            onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/images/carousel1.jpg"; }}
             alt="Colosseum Roman Forum Palatine Hill Private Tour"
             className="w-full h-full object-cover"
             style={{ objectPosition: "50% 15%" }} // center horizontally, top vertically

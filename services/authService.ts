@@ -1,5 +1,37 @@
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://m71db7r1-8000.asse.devtunnels.ms/api/v1";
 
+const FIELD_LABELS: Record<string, string> = {
+    email: "Email",
+    phone: "WhatsApp number",
+    first_name: "First name",
+    last_name: "Last name",
+    password: "Password",
+};
+
+// Turn an API error response into one readable sentence, whatever shape it has.
+async function readErrorMessage(response: Response, fallback: string): Promise<string> {
+    let data: any;
+    try {
+        data = await response.json();
+    } catch {
+        return response.status >= 500
+            ? "Our server had a problem. Please try again in a moment."
+            : fallback;
+    }
+    if (!data || typeof data !== "object") return fallback;
+    if (typeof data.detail === "string") return data.detail;
+    if (typeof data.message === "string") return data.message;
+
+    const messages: string[] = [];
+    for (const [key, value] of Object.entries(data)) {
+        const text = Array.isArray(value) ? value.join(" ") : typeof value === "string" ? value : "";
+        if (!text) continue;
+        const label = FIELD_LABELS[key];
+        messages.push(label && key !== "non_field_errors" ? `${label}: ${text}` : text);
+    }
+    return messages.length ? messages.join("\n") : fallback;
+}
+
 export async function registerUser(data: any) {
     const response = await fetch(`${API_BASE_URL}/auth/register/register`, {
         method: "POST",
@@ -10,21 +42,7 @@ export async function registerUser(data: any) {
     });
 
     if (!response.ok) {
-        const errorData = await response.json();
-        let errorMessage = "Registration failed";
-        if (errorData.detail) {
-            errorMessage = errorData.detail;
-        } else if (errorData.email && Array.isArray(errorData.email)) {
-            errorMessage = errorData.email[0];
-        } else if (typeof errorData === 'object') {
-            const firstKey = Object.keys(errorData)[0];
-            if (firstKey && Array.isArray(errorData[firstKey])) {
-                errorMessage = errorData[firstKey][0];
-            } else {
-                errorMessage = errorData.message || errorMessage;
-            }
-        }
-        throw new Error(errorMessage);
+        throw new Error(await readErrorMessage(response, "Registration failed. Please try again."));
     }
 
     return response.json();
@@ -40,21 +58,7 @@ export async function loginUser(data: any) {
     });
 
     if (!response.ok) {
-        const errorData = await response.json();
-        let errorMessage = "Login failed";
-        if (errorData.detail) {
-            errorMessage = errorData.detail;
-        } else if (errorData.email && Array.isArray(errorData.email)) {
-            errorMessage = errorData.email[0];
-        } else if (typeof errorData === 'object') {
-            const firstKey = Object.keys(errorData)[0];
-            if (firstKey && Array.isArray(errorData[firstKey])) {
-                errorMessage = errorData[firstKey][0];
-            } else {
-                errorMessage = errorData.message || errorMessage;
-            }
-        }
-        throw new Error(errorMessage);
+        throw new Error(await readErrorMessage(response, "Login failed. Please try again."));
     }
 
 

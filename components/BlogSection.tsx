@@ -54,7 +54,7 @@ const blogs = [
       "First Time in Rome? The Perfect 3-Day Itinerary (With Smart Ticket Planning)",
     excerpt:
       "Planning your first trip to Rome can feel overwhelming. With so many iconic landmarks, long queues, and limited time, having a smart itinerary is essential. This 3-day plan helps you experience the best of Rome while booking tickets strategically to avoid crowds.",
-    image: "/blogs/first-time-rome.png",
+    image: "/blogs/rome-itinerary.png",
     date: "March 2026",
     category: "Tour Itinerary",
     link: "/blog/first-time-rome",
@@ -127,6 +127,7 @@ const BlogSection = () => {
               <div className="relative h-56 overflow-hidden">
                 <img
                   src={blog.image}
+                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/images/carousel1.jpg"; }}
                   alt={blog.title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />

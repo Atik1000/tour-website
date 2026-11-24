@@ -1,17 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { X, Loader2, AlertTriangle, CheckCircle2 } from "lucide-react"
 import { loginUser, setTokens } from "@/services/authService"
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 
 interface LoginModalProps {
     isOpen: boolean
@@ -27,55 +18,49 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister, onLoginSuccess
         password: "",
     })
 
-    // Alert Dialog state
-    const [alertDialogState, setAlertDialogState] = useState<{
-        isOpen: boolean;
-        title: string;
-        description: string;
-        type: 'success' | 'error';
-    }>({
-        isOpen: false,
-        title: "",
-        description: "",
-        type: 'success'
-    })
+    const [error, setError] = useState("")
+    const [loggedIn, setLoggedIn] = useState(false)
 
-    const showAlert = (title: string, description: string, type: 'success' | 'error') => {
-        setAlertDialogState({ isOpen: true, title, description, type })
-    }
-
-    const handleAlertClose = () => {
-        setAlertDialogState(prev => ({ ...prev, isOpen: false }))
-        if (alertDialogState.type === 'success') {
-            if (onLoginSuccess) onLoginSuccess()
+    // After a successful login, show the confirmation briefly, then close.
+    useEffect(() => {
+        if (!loggedIn) return
+        const timer = setTimeout(() => {
+            setLoggedIn(false)
+            onLoginSuccess?.()
             onClose()
-        }
-    }
+        }, 1200)
+        return () => clearTimeout(timer)
+    }, [loggedIn]) // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!isOpen) return null
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
+        if (error) setError("")
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        setError("")
         setIsLoading(true)
         try {
             const data = await loginUser(formData)
             setTokens(data)
-            showAlert("Success", "Login successful!", 'success')
-        } catch (error: any) {
-            showAlert("Login Failed", error.message || "Invalid credentials. Please try again.", 'error')
+            setLoggedIn(true)
+        } catch (err: any) {
+            setError(
+                err instanceof TypeError
+                    ? "We couldn't reach the server. Check your internet connection and try again."
+                    : err?.message || "Invalid email or password. Please try again."
+            )
         } finally {
             setIsLoading(false)
         }
     }
 
     return (
-        <>
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-                <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl p-8 animate-in zoom-in-95 duration-200">
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className="relative w-full max-w-md my-auto bg-white rounded-2xl shadow-xl p-8 animate-in zoom-in-95 duration-200">
                     <button
                         onClick={onClose}
                         className="absolute right-4 top-4 p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
@@ -83,6 +68,16 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister, onLoginSuccess
                         <X size={20} />
                     </button>
 
+                    {loggedIn ? (
+                        <div className="text-center py-6" role="status">
+                            <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-4 mx-auto">
+                                <CheckCircle2 className="text-green-600 w-8 h-8" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-[#051036]">You're logged in</h2>
+                            <p className="text-gray-500 mt-2">Welcome back!</p>
+                        </div>
+                    ) : (
+                    <>
                     <div className="mb-8 text-center">
                         <h2 className="text-2xl font-bold text-[#051036]">Welcome back</h2>
                         <p className="text-gray-500 mt-2">Log in to your account</p>
@@ -120,6 +115,13 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister, onLoginSuccess
                             />
                         </div>
 
+                        {error && (
+                            <div role="alert" className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+                                <p className="whitespace-pre-line">{error}</p>
+                            </div>
+                        )}
+
                         <button
                             type="submit"
                             disabled={isLoading}
@@ -140,36 +142,9 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister, onLoginSuccess
                             </button>
                         </p>
                     </div>
+                    </>
+                    )}
                 </div>
             </div>
-
-            <AlertDialog open={alertDialogState.isOpen} onOpenChange={(open) => !open && handleAlertClose()}>
-                <AlertDialogContent className="bg-white rounded-2xl p-8 max-w-sm z-[1000]">
-                    <AlertDialogHeader>
-                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto ${alertDialogState.type === 'success' ? 'bg-green-50' : 'bg-red-50'}`}>
-                            {alertDialogState.type === 'success' ? (
-                                <CheckCircle2 className="text-green-600 w-8 h-8" />
-                            ) : (
-                                <AlertTriangle className="text-red-600 w-8 h-8" />
-                            )}
-                        </div>
-                        <AlertDialogTitle className="text-2xl font-bold text-[#051036] text-center">
-                            {alertDialogState.title}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="text-gray-500 text-center text-base pt-2">
-                            {alertDialogState.description}
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="pt-6 sm:justify-center">
-                        <AlertDialogAction
-                            onClick={handleAlertClose}
-                            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-12 rounded-full transition-all shadow-lg shadow-orange-500/20 border-none outline-none"
-                        >
-                            OK
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-        </>
     )
 }
